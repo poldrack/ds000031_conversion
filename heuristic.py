@@ -29,6 +29,21 @@ def infotodict(seqinfo):
     nback = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-nback_run-{item:01d}_bold')
     sbref_nback = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-nback_run-{item:01d}_sbref')
 
+    dots = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-dots_run-{item:01d}_bold')
+    sbref_dots = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-dots_run-{item:01d}_sbref')
+
+    breath = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-breathhold_run-{item:01d}_bold')
+    sbref_breath = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-breathhold_run-{item:01d}_sbref')
+
+    superloc = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-language_run-{item:01d}_bold')
+    sbref_superloc = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-language_run-{item:01d}_sbref')
+
+    hardeasy = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-spatialwm_run-{item:01d}_bold')
+    sbref_hardeasy = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-spatialwm_run-{item:01d}_sbref')
+
+    hardeasy = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-spatialwm_run-{item:01d}_bold')
+    sbref_hardeasy = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-spatialwm_run-{item:01d}_sbref')
+
     dwi_rl = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-RL_run-{item:01d}_dwi')
     sbref_dwi_rl = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-RL_run-{item:01d}_sbref')
     dwi_lr = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-LR_run-{item:01d}_dwi')
@@ -47,7 +62,12 @@ def infotodict(seqinfo):
             se_fmap_ap: [], se_fmap_pa: [],
             gre_fmap_mag: [], gre_fmap_phasediff: [],
             pdt2: [],
-            sbref_nback: [], nback: []}
+            sbref_nback: [], nback: [],
+            sbref_dots: [], dots: [],
+            sbref_breath: [], breath: [], 
+            sbref_superloc: [], superloc: [],
+            sbref_hardeasy: [], hardeasy: []
+            }
     last_run = len(seqinfo)
 
     for s in seqinfo:
@@ -85,6 +105,26 @@ def infotodict(seqinfo):
                 info[sbref_nback].append(s.series_id)
             else:
                 info[nback].append(s.series_id)
+        elif "dots_motion" in s.series_description:
+            if 'SBRef' in s.series_description:
+                info[sbref_dots].append(s.series_id)
+            else:
+                info[dots].append(s.series_id)
+        elif "Breath_Hold" in s.series_description:
+            if 'SBRef' in s.series_description:
+                info[sbref_breath].append(s.series_id)
+            else:
+                info[breath].append(s.series_id)
+        elif "superloc" in s.series_description:
+            if 'SBRef' in s.series_description:
+                info[sbref_superloc].append(s.series_id)
+            else:
+                info[superloc].append(s.series_id)
+        elif "hard_easy" in s.series_description:
+            if 'SBRef' in s.series_description:
+                info[sbref_hardeasy].append(s.series_id)
+            else:
+                info[hardeasy].append(s.series_id)
 
         elif ("MDDW" in s.series_description) and ('TRACE' not in s.series_description):
             direction = 'lr' if 'L-R' in s.series_description else 'rl'
