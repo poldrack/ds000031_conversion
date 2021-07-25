@@ -100,7 +100,7 @@ def infotodict(seqinfo):
                 info[sbref_rest].append(s.series_id)
             else:
                 info[rest].append(s.series_id)
-        elif "N Back fMRI" in s.series_description:
+        elif ("N Back fMRI" in s.series_description) or ("N-back" in s.series_description):
             if 'SBRef' in s.series_description:
                 info[sbref_nback].append(s.series_id)
             else:
