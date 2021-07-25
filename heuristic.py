@@ -41,8 +41,13 @@ def infotodict(seqinfo):
     hardeasy = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-spatialwm_run-{item:01d}_bold')
     sbref_hardeasy = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-spatialwm_run-{item:01d}_sbref')
 
-    hardeasy = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-spatialwm_run-{item:01d}_bold')
-    sbref_hardeasy = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-spatialwm_run-{item:01d}_sbref')
+    objects = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-objects_run-{item:01d}_bold')
+    sbref_objects = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-objects_run-{item:01d}_sbref')
+
+    ret = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-retintotopy_run-{item:01d}_bold')
+    sbref_ret = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-retintotopy_run-{item:01d}_sbref')
+
+
 
     dwi_rl = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-RL_run-{item:01d}_dwi')
     sbref_dwi_rl = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-RL_run-{item:01d}_sbref')
@@ -66,7 +71,9 @@ def infotodict(seqinfo):
             sbref_dots: [], dots: [],
             sbref_breath: [], breath: [], 
             sbref_superloc: [], superloc: [],
-            sbref_hardeasy: [], hardeasy: []
+            sbref_hardeasy: [], hardeasy: [],
+            sbref_objects: [], objects: [],
+            sbref_ret: [], ret: []
             }
     last_run = len(seqinfo)
 
@@ -105,12 +112,12 @@ def infotodict(seqinfo):
                 info[sbref_nback].append(s.series_id)
             else:
                 info[nback].append(s.series_id)
-        elif "dots_motion" in s.series_description:
+        elif ("Dots_Motion" in s.series_description)  or ("dots_motion" in s.series_description) or ("dot_motion" in s.series_description):
             if 'SBRef' in s.series_description:
                 info[sbref_dots].append(s.series_id)
             else:
                 info[dots].append(s.series_id)
-        elif "Breath_Hold" in s.series_description:
+        elif ("Breath_Hold" in s.series_description) or ('Breath Hold' in s.series_description):
             if 'SBRef' in s.series_description:
                 info[sbref_breath].append(s.series_id)
             else:
@@ -125,6 +132,18 @@ def infotodict(seqinfo):
                 info[sbref_hardeasy].append(s.series_id)
             else:
                 info[hardeasy].append(s.series_id)
+        elif "retinotopy" in s.series_description.lower():
+            if 'SBRef' in s.series_description:
+                info[sbref_ret].append(s.series_id)
+            else:
+                info[ret].append(s.series_id)
+        elif "face" in s.series_description.lower():
+            if 'SBRef' in s.series_description:
+                info[sbref_objects].append(s.series_id)
+            else:
+                info[objects].append(s.series_id)
+
+
 
         elif ("MDDW" in s.series_description) and ('TRACE' not in s.series_description):
             direction = 'lr' if 'L-R' in s.series_description else 'rl'
@@ -152,9 +171,9 @@ def infotodict(seqinfo):
 
         elif "PD-T2" in s.series_description:
             info[pdt2] = [s.series_id] # assign if a single scan meets criteria
-        elif 'T1w' in s.series_description:
+        elif ('MPRAGE' in s.series_description) or ('t1' in s.series_description) or ('T1w' in s.series_description):
             info[t1w] = [s.series_id] # assign if a single scan meets criteria
-        elif 'T2w' in s.series_description:
+        elif ('T2w' in s.series_description) or ('t2' in s.series_description):
             info[t2w] = [s.series_id] # assign if a single scan meets criteria
 
         else:
