@@ -56,7 +56,7 @@ def infotodict(seqinfo):
 
     se_fmap_ap = create_key('sub-{subject}/{session}/fmap/sub-{subject}_{session}_dir-AP_run-{item:01d}_epi')
     se_fmap_pa = create_key('sub-{subject}/{session}/fmap/sub-{subject}_{session}_dir-PA_run-{item:01d}_epi')
-    
+
     gre_fmap_mag = create_key('sub-{subject}/{session}/fmap/sub-{subject}_{session}_magnitude')
     gre_fmap_phasediff = create_key('sub-{subject}/{session}/fmap/sub-{subject}_{session}_phasediff')
     
@@ -114,17 +114,23 @@ def infotodict(seqinfo):
                 info[sbref_nback].append(s.series_id)
             else:
                 info[nback].append(s.series_id)
-        elif ("Dots_Motion" in s.series_description)  or ("dots_motion" in s.series_description) or ("dot_motion" in s.series_description):
+        elif ("Dots_Motion" in s.series_description) or ("dots_motion" in s.series_description) or ("dot_motion" in s.series_description):
+            if s.dim4 < 300:
+                continue
             if 'SBRef' in s.series_description:
                 info[sbref_dots].append(s.series_id)
             else:
                 info[dots].append(s.series_id)
         elif ("Breath_Hold" in s.series_description) or ('Breath Hold' in s.series_description):
+            if s.dim4 < 300:
+                continue
             if 'SBRef' in s.series_description:
                 info[sbref_breath].append(s.series_id)
             else:
                 info[breath].append(s.series_id)
         elif "superloc" in s.series_description:
+            if s.dim4 < 100:
+                continue
             if 'SBRef' in s.series_description:
                 info[sbref_superloc].append(s.series_id)
             else:
