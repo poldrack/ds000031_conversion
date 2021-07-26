@@ -133,7 +133,7 @@ if __name__ == "__main__":
         events_tsv = pd.DataFrame(d)       
         
         # save resulting dataframe as tsv file
-        outfile = outdir / ('sub-01_ses-%03d_task-nback_run-%03d_events.tsv' % (ses, ses_runnum[ses]))
+        outfile = outdir / ('sub-01_ses-%03d_task-nback_run-%d_events.tsv' % (ses, ses_runnum[ses]))
         if outfile.exists():
             print('warning: overwriting existing outfile', outfile.name)
         events_tsv.to_csv(outfile,

@@ -52,7 +52,7 @@ if __name__ == "__main__":
         all_events_df = pd.concat((trial_df, probe_df))
         all_events_df = all_events_df.sort_values('onset')
         # save resulting dataframe as tsv file
-        outfile = outdir / ('sub-01_ses-%03d_task-language_events.tsv' % sesnum)
+        outfile = outdir / ('sub-01_ses-%03d_task-language_run-1_events.tsv' % sesnum)
         if outfile.exists():
             print('warning: overwriting existing outfile', outfile.name)
         all_events_df.to_csv(outfile,
