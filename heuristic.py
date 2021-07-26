@@ -52,7 +52,7 @@ def infotodict(seqinfo):
     dwi_rl = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-RL_run-{item:01d}_dwi')
     sbref_dwi_rl = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-RL_run-{item:01d}_sbref')
     dwi_lr = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-LR_run-{item:01d}_dwi')
-    sbref_dwi_lr = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-RL-_run-{item:01d}_sbref')
+    sbref_dwi_lr = create_key('sub-{subject}/{session}/dwi/sub-{subject}_{session}_dir-RL_run-{item:01d}_sbref')
 
     se_fmap_ap = create_key('sub-{subject}/{session}/fmap/sub-{subject}_{session}_dir-AP_run-{item:01d}_epi')
     se_fmap_pa = create_key('sub-{subject}/{session}/fmap/sub-{subject}_{session}_dir-PA_run-{item:01d}_epi')
@@ -170,6 +170,7 @@ def infotodict(seqinfo):
                 info[gre_fmap_phasediff].append(s.series_id)
 
         elif "PD-T2" in s.series_description:
+            continue  #  SKIP PDT2
             info[pdt2] = [s.series_id] # assign if a single scan meets criteria
         elif ('MPRAGE' in s.series_description) or ('t1' in s.series_description) or ('T1w' in s.series_description):
             info[t1w] = [s.series_id] # assign if a single scan meets criteria
