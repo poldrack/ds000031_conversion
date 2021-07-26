@@ -44,8 +44,8 @@ def infotodict(seqinfo):
     objects = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-objects_run-{item:01d}_bold')
     sbref_objects = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-objects_run-{item:01d}_sbref')
 
-    ret = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-retintotopy_run-{item:01d}_bold')
-    sbref_ret = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-retintotopy_run-{item:01d}_sbref')
+    ret = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-retinotopy_run-{item:01d}_bold')
+    sbref_ret = create_key('sub-{subject}/{session}/func/sub-{subject}_{session}_task-retinotopy_run-{item:01d}_sbref')
 
 
 
@@ -108,6 +108,8 @@ def infotodict(seqinfo):
             else:
                 info[rest].append(s.series_id)
         elif ("N Back fMRI" in s.series_description) or ("N-back" in s.series_description):
+            if s.dim4 < 100:
+                continue
             if 'SBRef' in s.series_description:
                 info[sbref_nback].append(s.series_id)
             else:
@@ -142,9 +144,6 @@ def infotodict(seqinfo):
                 info[sbref_objects].append(s.series_id)
             else:
                 info[objects].append(s.series_id)
-
-
-
         elif ("MDDW" in s.series_description) and ('TRACE' not in s.series_description):
             direction = 'lr' if 'L-R' in s.series_description else 'rl'
             if "SBRef" in s.series_description:
