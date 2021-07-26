@@ -103,6 +103,8 @@ def infotodict(seqinfo):
         * image_type
         """
         if 'Resting State fMRI' in s.series_description:
+            if s.dim4 < 400:
+                continue
             if 'SBRef' in s.series_description:
                 info[sbref_rest].append(s.series_id)
             else:
