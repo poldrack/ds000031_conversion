@@ -50,7 +50,7 @@ if __name__ == "__main__":
         del trialinfo_df['stim']
 
             # save resulting dataframe as tsv file
-        outfile = outdir / ('sub-01_ses-%03d_task-objects_events.tsv' % sesnum)
+        outfile = outdir / ('sub-01_ses-%03d_task-objects_run-%d_events.tsv' % (sesnum, run))
         if outfile.exists():
             print('warning: overwriting existing outfile', outfile.name)
         trialinfo_df.to_csv(outfile,
