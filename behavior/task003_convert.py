@@ -48,6 +48,9 @@ if __name__ == "__main__":
         trialinfo_df['trial_type'] = [re.sub(r'[0-9]', '', i) for i in trialinfo_df['trial_type']]
         del trialinfo_df['stimclass']
         del trialinfo_df['stim']
+        del trialinfo_df['block']
+        trialinfo_df['duration'] = 0.5
+        trialinfo_df = trialinfo_df[['onset', 'duration', 'is_target', 'trial_type']]
 
             # save resulting dataframe as tsv file
         outfile = outdir / ('sub-01_ses-%03d_task-objects_run-%d_events.tsv' % (sesnum, run))

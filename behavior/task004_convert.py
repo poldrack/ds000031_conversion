@@ -58,13 +58,16 @@ if __name__ == "__main__":
         trial_event_df['response_time'] = 'n/a'
         trial_event_df['trial_type'] = 'sentence'
         trial_event_df['duration'] = 4
+        trial_event_df.loc[trial_event_df.accuracy.isna(), 'accuracy'] = 'n/a'
         probe_event_df = trialdata[['probe_onsets',  'stimulus_type', 'accuracy', 'response_time']].rename(
             {'probe_onsets': 'onset'}, axis=1)
         probe_event_df['trial_type'] = 'probe'
         probe_event_df['duration'] = 1
-        
+        probe_event_df.loc[probe_event_df.accuracy.isna(), 'accuracy'] = 'n/a'
+        probe_event_df['response_time'] = [i if not i == 'None' else 'n/a' for i in probe_event_df.response_time]
         all_events_df = pd.concat((trial_event_df, probe_event_df))
         all_events_df = all_events_df.sort_values('onset')
+        all_events_df = all_events_df[['onset', 'duration', 'stimulus_type', 'accuracy', 'response_time', 'trial_type']]
         # save resulting dataframe as tsv file
         outfile = outdir / ('sub-01_ses-%03d_task-language_run-1_events.tsv' % sesnum)
         if outfile.exists():
