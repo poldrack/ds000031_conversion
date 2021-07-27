@@ -1,10 +1,15 @@
-import os
 
+import os
+from collections import defaultdict
 
 def create_key(template, outtype=('nii.gz',), annotation_classes=None):
     if template is None or not template:
         raise ValueError('Template must be a valid format string')
     return template, outtype, annotation_classes
+
+
+def get_series_num(series_id):
+    return(int(series_id.split('-')[0]))
 
 
 def infotodict(seqinfo):
@@ -76,6 +81,7 @@ def infotodict(seqinfo):
             sbref_ret: [], ret: []
             }
     last_run = len(seqinfo)
+    latest_sbref = '999-dummy' 
 
     for s in seqinfo:
         """
@@ -102,56 +108,75 @@ def infotodict(seqinfo):
         * series_description
         * image_type
         """
-        if 'Resting State fMRI' in s.series_description:
-            if s.dim4 < 400:
+        minlength = {
+            'rest': 518,
+            'nback': 380,
+            'dots': 372,
+            'breathhold': 318,
+            'language': 326,
+            'spatialwm': 387,
+            'retinotopy': 200,
+            'objects': 270
+        }
+
+        if 'SBRef' in s.series_description:
+            latest_sbref = s.series_id
+        elif 'Resting State fMRI' in s.series_description:
+            if s.dim4 < minlength['rest']:
                 continue
-            if 'SBRef' in s.series_description:
+            if int(get_series_num(latest_sbref)) == (int(get_series_num(s.series_id)) - 1):
                 info[sbref_rest].append(s.series_id)
-            else:
-                info[rest].append(s.series_id)
+                print('SBRef', s.series_id, latest_sbref)
+            info[rest].append(s.series_id)
         elif ("N Back fMRI" in s.series_description) or ("N-back" in s.series_description):
-            if s.dim4 < 100:
+            if s.dim4 < minlength['nback']:
                 continue
-            if 'SBRef' in s.series_description:
+            if int(get_series_num(latest_sbref)) == (int(get_series_num(s.series_id)) - 1):
                 info[sbref_nback].append(s.series_id)
-            else:
-                info[nback].append(s.series_id)
+                print('SBRef', s.series_id, latest_sbref)
+            info[nback].append(s.series_id)
         elif ("Dots_Motion" in s.series_description) or ("dots_motion" in s.series_description) or ("dot_motion" in s.series_description):
-            if s.dim4 < 300:
+            if s.dim4 < minlength['dots']:
                 continue
-            if 'SBRef' in s.series_description:
+            if int(get_series_num(latest_sbref)) == (int(get_series_num(s.series_id)) - 1):
                 info[sbref_dots].append(s.series_id)
-            else:
-                info[dots].append(s.series_id)
+                print('SBRef', s.series_id, latest_sbref)
+            info[dots].append(s.series_id)
         elif ("Breath_Hold" in s.series_description) or ('Breath Hold' in s.series_description):
-            if s.dim4 < 300:
+            if s.dim4 < minlength['breathhold']:
                 continue
-            if 'SBRef' in s.series_description:
+            if int(get_series_num(latest_sbref)) == (int(get_series_num(s.series_id)) - 1):
                 info[sbref_breath].append(s.series_id)
-            else:
-                info[breath].append(s.series_id)
+                print('SBRef', s.series_id, latest_sbref)
+            info[breath].append(s.series_id)
         elif "superloc" in s.series_description:
-            if s.dim4 < 100:
+            if s.dim4 < minlength['language']:
                 continue
-            if 'SBRef' in s.series_description:
+            if int(get_series_num(latest_sbref)) == (int(get_series_num(s.series_id)) - 1):
                 info[sbref_superloc].append(s.series_id)
-            else:
-                info[superloc].append(s.series_id)
+                print('SBRef', s.series_id, latest_sbref)
+            info[superloc].append(s.series_id)
         elif "hard_easy" in s.series_description:
-            if 'SBRef' in s.series_description:
+            if s.dim4 < minlength['spatialwm']:
+                continue
+            if int(get_series_num(latest_sbref)) == (int(get_series_num(s.series_id)) - 1):
                 info[sbref_hardeasy].append(s.series_id)
-            else:
-                info[hardeasy].append(s.series_id)
+                print('SBRef', s.series_id, latest_sbref)
+            info[hardeasy].append(s.series_id)
         elif "retinotopy" in s.series_description.lower():
-            if 'SBRef' in s.series_description:
+            if s.dim4 < minlength['retinotopy']:
+                continue
+            if int(get_series_num(latest_sbref)) == (int(get_series_num(s.series_id)) - 1):
                 info[sbref_ret].append(s.series_id)
-            else:
-                info[ret].append(s.series_id)
+                print('SBRef', s.series_id, latest_sbref)
+            info[ret].append(s.series_id)
         elif "face" in s.series_description.lower():
-            if 'SBRef' in s.series_description:
+            if s.dim4 < minlength['objects']:
+                continue
+            if int(get_series_num(latest_sbref)) == (int(get_series_num(s.series_id)) - 1):
                 info[sbref_objects].append(s.series_id)
-            else:
-                info[objects].append(s.series_id)
+                print('SBRef', s.series_id, latest_sbref)
+            info[objects].append(s.series_id)
         elif ("MDDW" in s.series_description) and ('TRACE' not in s.series_description):
             direction = 'lr' if 'L-R' in s.series_description else 'rl'
             if "SBRef" in s.series_description:
