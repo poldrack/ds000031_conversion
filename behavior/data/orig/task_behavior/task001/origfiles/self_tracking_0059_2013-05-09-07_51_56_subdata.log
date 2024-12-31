@@ -1,0 +1,9 @@
+5.3035	INFO	Loaded calibration from:2012_09_26 16:15
+5.3036	INFO	['2012_09_26 16:15']
+5.3045	INFO	configured pyglet screen 0
+5.3046	WARNING	User requested fullscreen with size [800 600], but screen is actually [1024, 768]. Using actual size
+5.6638	INFO	Using gamma table of operating system
+5.6730	EXP	Set Window color=[ 0.  0.  0.] (rgb)
+6.2065	EXP	Started presenting 
+17.6496	DATA	Keypress: q
+17.6504	DATA	Key pressed: q

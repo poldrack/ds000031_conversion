@@ -1,0 +1,15 @@
+4.0807	INFO	Loaded calibration from:2012_09_26 16:15
+4.0807	INFO	['2012_09_26 16:15']
+4.0816	INFO	configured pyglet screen 0
+4.4454	INFO	Using gamma table of operating system
+4.4716	EXP	Set Window color=[ 0.  0.  0.] (rgb)
+5.0385	EXP	Started presenting 
+6.3492	DATA	Keypress: 4
+6.3500	DATA	Key pressed: 4
+14.3997	DATA	Mouse: Right button down, pos=(143,509)
+14.5116	DATA	Mouse: Right button up, pos=(143,509)
+23.2644	DATA	Mouse: Left button up, pos=(106,612)
+28.1281	DATA	Mouse: Left button down, pos=(87,549)
+28.2320	DATA	Mouse: Left button up, pos=(88,549)
+30.8621	DATA	Keypress: q
+30.8624	DATA	Key pressed: q

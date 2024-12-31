@@ -1,0 +1,41 @@
+Subject ID: self-tracking_0099_r1
+Acquisition number: 1
+Counterbalancing number: 1
+Preference file: prefs_2cond_regtime_task.cfg
+Condition Sent
+Total in condition:
+Response: 23
+No response: 1
+RT mean: 0.906893647235
+RT standard deviation: 0.121848281677
+Accuracy mean: 0.913043478261
+Accuracy standard deviation: 0.28810406552
+Subcondition 1
+Response: 23
+No response: 1
+RT mean: 0.906893647235
+RT standard deviation: 0.121848281677
+Accuracy mean: 0.913043478261
+Accuracy standard deviation: 0.28810406552
+Condition Nonw
+Total in condition:
+Response: 24
+No response: 0
+RT mean: 1.05452175935
+RT standard deviation: 0.165953633515
+Accuracy mean: 0.708333333333
+Accuracy standard deviation: 0.464305621488
+Subcondition 1
+Response: 24
+No response: 0
+RT mean: 1.05452175935
+RT standard deviation: 0.165953633515
+Accuracy mean: 0.708333333333
+Accuracy standard deviation: 0.464305621488
+Total across conditions:
+Response: 47
+No response: 1
+RT mean: 0.982278215124
+RT standard deviation: 0.162589931672
+Accuracy mean: 0.808510638298
+Accuracy standard deviation: 0.397727122554

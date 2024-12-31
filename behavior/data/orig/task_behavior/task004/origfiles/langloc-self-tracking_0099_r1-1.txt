@@ -1,0 +1,2 @@
+Preference file: prefs_2cond_regtime_task.cfg
+Run initiated at: 2014-02-18 07:47:26.392955

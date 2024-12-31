@@ -1,0 +1,600 @@
+(dp0
+S'stim_onset_time'
+p1
+(dp2
+sS'datestamp'
+p3
+S'2013-01-17-07_47_37'
+p4
+sS'ntrials_per_block'
+p5
+I6
+sS'expt_title'
+p6
+S'Self_Tracking'
+p7
+sS'rt'
+p8
+(dp9
+sS'simulated_response'
+p10
+I00
+sS'script'
+p11
+(lp12
+S'#!/usr/bin/env python\n'
+p13
+aS'\n'
+p14
+aS'import psychopy\n'
+p15
+aS'from psychopy import visual, core, event, logging, data, misc, sound\n'
+p16
+aS'import numpy as N\n'
+p17
+aS'import pickle,csv\n'
+p18
+aS'import datetime\n'
+p19
+aS'import sys\n'
+p20
+aS'import os, socket, random\n'
+p21
+aS'import inspect\n'
+p22
+aS'import hashlib\n'
+p23
+aS'from socket import gethostname\n'
+p24
+aS'import exptutils\n'
+p25
+aS'from exptutils import *\n'
+p26
+aS'from pylab import imread\n'
+p27
+ag14
+aS'try:\n'
+p28
+aS'    from save_data_to_db import *\n'
+p29
+aS'    save_data=1\n'
+p30
+aS'except:\n'
+p31
+aS"    print 'cannnot import save_data_to_db'\n"
+p32
+aS'    save_data=0\n'
+p33
+ag14
+aS'def store_scriptfile():\n'
+p34
+aS'    scriptfile= inspect.getfile(inspect.currentframe())# save a copy of the script in the data file\n'
+p35
+aS'    f=open(scriptfile)\n'
+p36
+aS'    script=f.readlines()\n'
+p37
+aS'    f.close()\n'
+p38
+aS'    return script\n'
+p39
+ag14
+aS'#\n'
+p40
+aS'#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n'
+p41
+aS'#define functions for awaiting keyboard input & displaying initial instructions\n'
+p42
+aS'#these functions will be called prior to the stim_block() function (at bottom)\n'
+p43
+ag14
+aS'def wait_for_trigger():\n'
+p44
+aS'    event.clearEvents()\n'
+p45
+aS"    if subdata['simulated_response']:\n"
+p46
+aS'        msg="SIMULATION MODE"\n'
+p47
+aS'    else:\n'
+p48
+aS"        msg=''\n"
+p49
+aS"    message=visual.TextStim(win, text='%s Waiting for start key (or press %s)'%(msg,subdata['start_key']),\n"
+p50
+aS"    font='BiauKai', height=1,color=u'white', colorSpace=u'rgb', opacity=1,depth=0.0,\n"
+p51
+aS"    alignHoriz='center',wrapWidth=50)\n"
+p52
+aS'    message.setAutoDraw(True) #automatically draw every frame\n'
+p53
+aS'    win.flip()\n'
+p54
+aS'    start=False\n'
+p55
+aS'    while start==False:\n'
+p56
+aS'        k=event.waitKeys()\n'
+p57
+aS"        if k.count(subdata['start_key'])>0:#as soon as subdata['start_key'] is pressed...\n"
+p58
+aS'            start=True\n'
+p59
+aS"            message.setText('')#this clears the screen\n"
+p60
+aS'            win.flip()\n'
+p61
+aS"        if k.count(subdata['quit_key']) >0:# if subdata['quit_key'] is pressed...\n"
+p62
+aS'            exptutils.shut_down_cleanly(subdata,win)\n'
+p63
+aS'            return subdata\n'
+p64
+aS'            \n'
+p65
+aS"def instructions(n,duration):#n here changes depending on the n-back level; yes/no will also switch between 'u' & 'i' keys depending on the Order number selected\n"
+p66
+aS'    event.clearEvents()\n'
+p67
+aS"    instructions=visual.TextStim(win=win, ori=0, name='instructions',font='BiauKai',\n"
+p68
+aS"        text='%d back'%n,\n"
+p69
+aS"        height=2,color=u'white', colorSpace=u'rgb', alignHoriz='center',wrapWidth=50)\n"
+p70
+aS'    instructions.setAutoDraw(True)\n'
+p71
+aS'    win.flip()\n'
+p72
+aS'    core.wait(duration)#currently it is set up to keep instructions on screen the designated amt of time; a button press will not end these instructions sooner\n'
+p73
+aS"    instructions.setText('')\n"
+p74
+aS'    win.flip()\n'
+p75
+ag14
+aS'#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+p76
+ag14
+ag14
+aS'#define function for displaying visual stims for each trial on n-back task\n'
+p77
+ag14
+aS'def draw_stim(win,event_info,subdata,visual_stim):\n'
+p78
+aS'    trialdata={}\n'
+p79
+aS"    trialdata['duration']=subdata['stim_dur']\n"
+p80
+aS"    trialdata['onset'],trialdata['block'],trialdata['nback'],trialdata['match'],trialdata['stim']=event_info\n"
+p81
+aS'    # NB: I removed a lot of data handling stuff from within this function\n'
+p82
+aS'    # instead, the data get returned and handled at the calling level\n'
+p83
+aS"    print trialdata['stim']\n"
+p84
+aS"    if trialdata['stim'].find('faces')>-1:#if it is a face image, display vertically\n"
+p85
+aS"        stim_type='faces'\n"
+p86
+aS"    elif trialdata['stim'].find('scenes')>-1:#\n"
+p87
+aS"        stim_type='scenes'\n"
+p88
+aS'    else:#if it is a character, display as text\n'
+p89
+aS"        stim_type='chinese_characters'\n"
+p90
+aS'        \n'
+p91
+aS"    visual_stim.setImage(trialdata['stim'])\n"
+p92
+aS"    trialdata['stim_type']=stim_type\n"
+p93
+aS'    \n'
+p94
+aS'        #visual_stim[stim_type].setAutoDraw(True)#get the image ready to display\n'
+p95
+aS'    visual_stim.draw()\n'
+p96
+aS"    while clock.getTime()<trialdata['onset']:#wait until the specified onset time to display image_file\n"
+p97
+aS'        pass\n'
+p98
+aS'    win.flip()\n'
+p99
+aS"    trialdata['actual_onset_time']=clock.getTime()\n"
+p100
+aS'    event.clearEvents()#clear all button presses\n'
+p101
+aS'    thisResp=None\n'
+p102
+aS'    simulated_rt=0.5 + N.random.rand()*0.1\n'
+p103
+aS"    while clock.getTime() < (trialdata['actual_onset_time'] + trialdata['duration']):#before the subdata['stim_dur'] time is exceeded, do this stuff...\n"
+p104
+aS'            key_response=event.getKeys()#look for yes,no, and quit commands\n'
+p105
+aS"            if subdata['simulated_response']:\n"
+p106
+aS"                if clock.getTime()> trialdata['actual_onset_time'] + simulated_rt:\n"
+p107
+aS'                    thisResp=1\n'
+p108
+aS"                    trialdata['rt']=clock.getTime() - trialdata['actual_onset_time'] #collect rt\n"
+p109
+aS"                    if trialdata['match']==trialdata['nback']:\n"
+p110
+aS"                        trialdata['response']='4'\n"
+p111
+aS'                    else:\n'
+p112
+aS"                        trialdata['response']='1'\n"
+p113
+ag14
+aS'            elif key_response:#if they press any button\n'
+p114
+aS"                if key_response.count(subdata['quit_key'])>0:#if subj hits subdata['quit_key']...\n"
+p115
+aS'                    keep_going=0\n'
+p116
+aS"                    #subdata['broke_on_trial'][which_block]=trial_num\n"
+p117
+aS'                    #shut_down_cleanly(subdata,win)\n'
+p118
+aS'                    return None\n'
+p119
+aS"                elif key_response.count('5')>0:\n"
+p120
+aS"                    subdata['trigger_times'].append(clock.getTime())\n"
+p121
+aS'                else:\n'
+p122
+aS'                    thisResp=1\n'
+p123
+aS"                    trialdata['rt']=clock.getTime() - trialdata['actual_onset_time'] #collect rt\n"
+p124
+aS"                    trialdata['response']=key_response[0]#collect response\n"
+p125
+ag14
+aS'    visual_stim.clearTextures()\n'
+p126
+ag14
+aS'    win.flip()\n'
+p127
+ag14
+aS'    #del visual_stim\n'
+p128
+aS'    return trialdata\n'
+p129
+aS'    \n'
+p130
+ag14
+ag14
+aS'#Text saying the task has finished. Disappears with key press\n'
+p131
+ag14
+aS'def display_finished_text():#finished with experiment\n'
+p132
+aS'    event.clearEvents()\n'
+p133
+aS'    message=visual.TextStim(win=win, ori=0,\n'
+p134
+aS"    text='All finished! Thanks  :) \\n Press any key to clear the screen.',\n"
+p135
+aS"    font=u'BiauKai',pos=[0, 0], height=2,color=u'white', colorSpace=u'rgb', opacity=1,depth=0.0,alignHoriz='center',wrapWidth=50)\n"
+p136
+aS'    message.setAutoDraw(True) \n'
+p137
+aS'    win.flip()\n'
+p138
+aS'    start=False\n'
+p139
+aS'    while start==False:\n'
+p140
+aS'        key_response=event.getKeys()\n'
+p141
+aS'        if len(key_response)>0:\n'
+p142
+aS'            start=True\n'
+p143
+aS"            message.setText('')#this clears the screen\n"
+p144
+aS'            win.flip()\n'
+p145
+aS'    return start\n'
+p146
+aS'#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n'
+p147
+ag14
+aS'    \n'
+p148
+aS'#set-up some variables\n'
+p149
+ag14
+aS'verbose=True\n'
+p150
+aS'fullscr=False  # change to True for full screen display\n'
+p151
+ag14
+aS"stim_types=['faces','scenes','chinese_characters']\n"
+p152
+aS'subdata={}\n'
+p153
+aS'finish_time=440\n'
+p154
+ag14
+aS"subdata['start_key']='5'\n"
+p155
+aS"subdata['quit_key']='q'\n"
+p156
+aS"subdata['discard_time_to_wait']=0.0\n"
+p157
+aS"subdata['expt_title']='Self_Tracking'\n"
+p158
+aS"subdata['stim_dur']=1.0\n"
+p159
+aS"subdata['inter_stim_int']=1.0\n"
+p160
+aS"subdata['inst_time']=1.0\n"
+p161
+aS"subdata['rest_time']=10.0\n"
+p162
+aS"subdata['ExpVersion']=0.1\n"
+p163
+aS"subdata['nstims']=5\n"
+p164
+aS"subdata['ntrials_per_block']=6\n"
+p165
+aS"subdata['simulated_response']=False\n"
+p166
+aS"subdata['trigger_times']=[]\n"
+p167
+ag14
+aS'if len(sys.argv)<2:\n'
+p168
+aS"    print 'USAGE: self_tracking.py <stimlist> <session code>'\n"
+p169
+aS'    sys.exit()\n'
+p170
+aS"    #subdata['onsetfile']='/Users/poldrack/Dropbox/Documents/Projects/self-tracking/task/onsetlists/stimlist_000.txt'\n"
+p171
+aS'else:\n'
+p172
+aS"    subdata['onsetfile']=sys.argv[1]\n"
+p173
+aS"    subdata['subcode']=sys.argv[2]\n"
+p174
+ag14
+ag14
+aS'# initialize subdata dictionary to store info about the study\n'
+p175
+aS"subdata['completed']=0\n"
+p176
+aS"subdata['cwd']=os.getcwd()\n"
+p177
+aS"subdata['hostname']=socket.gethostname()\n"
+p178
+aS'clock=core.Clock()\n'
+p179
+aS'datestamp=datetime.datetime.now().strftime("%Y-%m-%d-%H_%M_%S")\n'
+p180
+aS"subdata['datestamp']=datestamp\n"
+p181
+aS"subdata['expt_title']=subdata['expt_title']\n"
+p182
+aS"subdata['script']=store_scriptfile()\n"
+p183
+aS"subdata['onsets']=subdata['onsetfile']\n"
+p184
+ag14
+aS'#these are all sub-dictionaries which will be appended w/separate info for each block & each trial\n'
+p185
+aS"#i.e., the 'response' dictionary will contain the following dictionaries: face_1, face_2, scenes_1, scenes_2, whose keys are trial_num and values are the responses on that trial\n"
+p186
+aS"subdata['response']={}\n"
+p187
+aS"subdata['score']={}\n"
+p188
+aS"subdata['rt']={}\n"
+p189
+aS"subdata['stim_onset_time']={}\n"
+p190
+aS"subdata['stim_log']={}\n"
+p191
+aS"subdata['is_this_SS_trial']={}\n"
+p192
+aS"subdata['SS']={}\n"
+p193
+aS"subdata['broke_on_trial']={}\n"
+p194
+ag14
+aS'# set up logging information & create Output directories\n'
+p195
+aS"if not os.path.isdir('Output'):#make an Output directory if necessary\n"
+p196
+aS"    os.makedirs('Output') \n"
+p197
+ag14
+aS"dataFileName='Output/%s_%s_subdata.log'%(subdata['subcode'],subdata['datestamp'])\n"
+p198
+aS'logging.console.setLevel(logging.INFO)\n'
+p199
+aS'logfile=logging.LogFile(dataFileName,level=logging.INFO)\n'
+p200
+ag14
+aS'# load stimulus file\n'
+p201
+ag14
+aS'def load_stimulus_file(onsfile):\n'
+p202
+aS'    events=[]\n'
+p203
+aS'    f=open(onsfile)\n'
+p204
+aS'    l=f.readlines()\n'
+p205
+aS'    for line in l:\n'
+p206
+aS"        l_s=line.strip('\\n').split('\\t')\n"
+p207
+aS'        events.append([float(l_s[0]),int(l_s[1]),int(l_s[2]),int(l_s[3]),l_s[4]])\n'
+p208
+aS'    f.close()\n'
+p209
+aS'    return events\n'
+p210
+ag14
+aS"events=load_stimulus_file(subdata['onsetfile'])\n"
+p211
+ag14
+aS'# set up the window \n'
+p212
+aS"win = visual.Window([800,600],allowGUI=True, fullscr=True, monitor='testMonitor', units='deg')\n"
+p213
+aS"win.setColor('black')\n"
+p214
+aS'win.flip()\n'
+p215
+aS'win.flip()\n'
+p216
+ag14
+aS'#integrating everything together\n'
+p217
+ag14
+aS"subdata['trialdata']={}\n"
+p218
+aS'#chardict=create_characters_dict()\n'
+p219
+ag14
+aS"wait_for_trigger()#wait for subdata['start_key'] to be pressed\n"
+p220
+ag14
+aS'visual_stim={}\n'
+p221
+aS"visual_stim=visual.ImageStim(win, image=N.zeros((10,10)), size=(0.75,0.75),units='height')\n"
+p222
+ag14
+aS'# set clock to zero\n'
+p223
+aS'clock.reset()\n'
+p224
+aS'trialctr=0\n'
+p225
+aS'for i in range(len(events)):\n'
+p226
+aS"    if events[i][4]=='inst':\n"
+p227
+aS'        while clock.getTime() < events[i][0]:\n'
+p228
+aS'            pass\n'
+p229
+aS"        instructions(events[i][2],subdata['inst_time'])\n"
+p230
+aS'    else:\n'
+p231
+aS"        subdata['trialdata'][trialctr]=draw_stim(win,events[i],subdata,visual_stim)\n"
+p232
+aS"        if subdata['trialdata'][trialctr]==None:\n"
+p233
+aS'            break\n'
+p234
+aS'        trialctr+=1\n'
+p235
+aS"        print 'return time:',clock.getTime()\n"
+p236
+ag14
+aS'#display_finished_text()\n'
+p237
+aS'while clock.getTime()<finish_time:\n'
+p238
+aS'\tpass\n'
+p239
+aS'\t\n'
+p240
+aS"subdata['events']=events\n"
+p241
+aS'if save_data==1:\n'
+p242
+aS"    docId,docRev=save_data_to_db(subdata,'selftracking-taskdata')\n"
+p243
+ag14
+aS'shut_down_cleanly(subdata,win)\n'
+p244
+asS'onsets'
+p245
+S'onsetlists/stimlist_005.txt'
+p246
+sS'hostname'
+p247
+S'IRC-arizona'
+p248
+sS'score'
+p249
+(dp250
+sS'rest_time'
+p251
+F10.0
+sS'cwd'
+p252
+S'/Users/rap2623/Dropbox/Documents/Projects/self-tracking/task'
+p253
+sS'trigger_times'
+p254
+(lp255
+sS'ExpVersion'
+p256
+F0.1
+sS'completed'
+p257
+I0
+sS'stim_dur'
+p258
+F1.0
+sS'quit_key'
+p259
+S'q'
+p260
+sS'onsetfile'
+p261
+g246
+sS'discard_time_to_wait'
+p262
+F0.0
+sS'response'
+p263
+(dp264
+sS'trialdata'
+p265
+(dp266
+sS'stim_log'
+p267
+(dp268
+sS'nstims'
+p269
+I5
+sS'inter_stim_int'
+p270
+F1.0
+sS'SS'
+p271
+(dp272
+sS'inst_time'
+p273
+F1.0
+sS'broke_on_trial'
+p274
+(dp275
+sS'is_this_SS_trial'
+p276
+(dp277
+sS'subcode'
+p278
+S'self_tracking_0038'
+p279
+sS'start_key'
+p280
+S'5'
+p281
+s.
